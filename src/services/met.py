@@ -1,3 +1,4 @@
+import os
 import requests
 import random
 
@@ -5,11 +6,11 @@ from typing import Optional
 from typing_extensions import Self
 
 
-class WallpaperService:
+class MetropolitanMeseumOfArtService:
     def __init__(self) -> None:
         pass
 
-    def get_wallpaper(self: Self, query: Optional[str], choose_random: bool) -> dict:
+    def get_artwork(self: Self, query: Optional[str], choose_random: bool) -> dict:
         SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
         DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
@@ -33,18 +34,19 @@ class WallpaperService:
 
         return details_response_data
 
-    def download_wallpaper(self: Self, image_url: str, location: str):
+    def download_artwork(self: Self, id: int, image_url: str, location: str):
         # download image
         response = requests.get(image_url)
 
+        # check if outdir exists, if not create it
+        if not os.path.exists(location):
+            os.mkdir(location)
+
         # create file
-        f = open(location, "wb")
+        f = open(os.path.join(location, f"{id}.png"), "wb")
 
         # write to file
         f.write(response.content)
 
         # close file
         f.close()
-
-    def set_wallpaper(self: Self, image_url: str):
-        print(image_url)

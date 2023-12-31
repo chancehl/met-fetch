@@ -1,11 +1,16 @@
 import argparse
+import os
 
-from services import wallpaper, artwork
+from services.met import MetropolitanMeseumOfArtService
+from utils.print import color, Color
 
-DEFAULT_SAVE_LOCATION = "test.png"
+DEFAULT_SAVE_LOCATION = "./images"
+NUM_RETRIES = 3
 
 
 def main():
+    os.system("")
+
     # parser object
     parser = argparse.ArgumentParser(
         description="A CLI tool for setting artwork from the Metropolitan Museum of Art as your desktop background"
@@ -26,24 +31,24 @@ def main():
         help="Selects a random object from the objects returned. If no query is provided, this will search for a random object.",
     )
 
-    # retries argument
-    parser.add_argument(
-        "-n",
-        "--num-retries",
-        type=int,
-        default=3,
-        metavar="num_retries",
-        help="The number of times to retry to get a piece of art that has an image. Default=3.",
-    )
-
     # outfile argument
     parser.add_argument(
         "-o",
-        "--outfile",
+        "--outdir",
         type=str,
         default=None,
-        metavar="outfile",
-        help="The location to save the image to. By default the CLI will create a tmp file and then delete it after the run.",
+        metavar="outdir",
+        help="The location to save the images to.",
+    )
+
+    # count argument
+    parser.add_argument(
+        "-n",
+        "--count",
+        type=int,
+        default=1,
+        metavar="count",
+        help="The count of images to return",
     )
 
     # verbose argument
@@ -60,37 +65,52 @@ def main():
     args = parser.parse_args()
 
     # instantiate services
-    wallpaper_service = wallpaper.WallpaperService()
-    artwork_service = artwork.ArtworkService()
+    artwork_service = MetropolitanMeseumOfArtService()
 
-    attempt = 0
+    image_count = 0
 
-    # sometimes the API responds with a piece of art that does not have an image
-    # when that happens, just retry
-    while attempt < args.num_retries:
-        met_artwork = wallpaper_service.get_wallpaper(args.query, args.random)
+    while image_count < args.count:
+        attempt = 0
 
-        image_url = met_artwork.get("primaryImage")
+        # sometimes the API responds with a piece of art that does not have an image
+        # when that happens, just retry
+        while attempt < NUM_RETRIES:
+            met_artwork = artwork_service.get_artwork(args.query, args.random)
 
-        if image_url is None or len(image_url) == 0:
-            attempt += 1
-        else:
-            # determine save location
-            location = (
-                args.outfile if args.outfile is not None else DEFAULT_SAVE_LOCATION
-            )
+            image_url = met_artwork.get("primaryImage")
+            image_id = met_artwork.get("objectID")
 
-            # download the file to specified location
-            wallpaper_service.download_wallpaper(image_url, location)
+            if image_url is None or len(image_url) == 0:
+                attempt += 1
+            else:
+                # determine save location
+                save_location = (
+                    args.outdir if args.outdir is not None else DEFAULT_SAVE_LOCATION
+                )
 
-            # set the wallpaper
-            wallpaper_service.set_wallpaper(location)
+                # download the file to specified location
+                artwork_service.download_artwork(image_id, image_url, save_location)
 
-            # give report
-            artwork_service.report(met_artwork)
+                # generate report
+                artists = met_artwork.get("constituents")
+                artist_name = (
+                    artists[0].get("name") if artists is not None else "Unknown"
+                )
+                department = met_artwork.get("department")
+                title = met_artwork.get("title")
+                object_date = met_artwork.get("objectDate")
 
-            # exit process
-            exit(0)
+                print(
+                    f'{image_count+1}.) "{color(title, Color.CYAN)}" by {color(artist_name, Color.GREEN)} ({object_date}, {department} department)'
+                )
+
+                # break out of loop if we've made it here
+                break
+
+        image_count += 1
+
+    # exit process
+    exit(0)
 
 
 if __name__ == "__main__":
