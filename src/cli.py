@@ -67,9 +67,15 @@ def main():
     # instantiate services
     artwork_service = MetropolitanMeseumOfArtService()
 
+    # determine appropriate count
+    if args.count > 1 and (args.random is None or args.random == False):
+        print(f"{color("Invalid arguments:", Color.YELLOW)} If the -r/--random flag is not passed, then count can only be 1")
+
+    count = args.count if args.random is not None and args.random == True else 1
+
     image_count = 0
 
-    while image_count < args.count:
+    while image_count < count:
         attempt = 0
 
         # sometimes the API responds with a piece of art that does not have an image
