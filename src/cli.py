@@ -1,6 +1,6 @@
 import argparse
 
-from services import wallpaper
+from services import wallpaper, artwork
 
 DEFAULT_SAVE_LOCATION = "test.png"
 
@@ -59,15 +59,18 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # execute program
+    # instantiate services
     wallpaper_service = wallpaper.WallpaperService()
+    artwork_service = artwork.ArtworkService()
 
     attempt = 0
 
     # sometimes the API responds with a piece of art that does not have an image
     # when that happens, just retry
     while attempt < args.num_retries:
-        image_url = wallpaper_service.get_wallpaper(args.query, args.random)
+        met_artwork = wallpaper_service.get_wallpaper(args.query, args.random)
+
+        image_url = met_artwork.get("primaryImage")
 
         if image_url is None or len(image_url) == 0:
             attempt += 1
@@ -82,6 +85,9 @@ def main():
 
             # set the wallpaper
             wallpaper_service.set_wallpaper(location)
+
+            # give report
+            artwork_service.report(met_artwork)
 
             # exit process
             exit(0)

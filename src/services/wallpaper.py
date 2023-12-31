@@ -1,5 +1,6 @@
 import requests
 import random
+
 from typing import Optional
 from typing_extensions import Self
 
@@ -8,9 +9,7 @@ class WallpaperService:
     def __init__(self) -> None:
         pass
 
-    def get_wallpaper(
-        self: Self, query: Optional[str], choose_random: bool
-    ) -> Optional[str]:
+    def get_wallpaper(self: Self, query: Optional[str], choose_random: bool) -> dict:
         SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
         DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
@@ -32,10 +31,7 @@ class WallpaperService:
         # deserialize details response
         details_response_data = details_response.json()
 
-        # grab url and return
-        image_url = details_response_data.get("primaryImage")
-
-        return image_url
+        return details_response_data
 
     def download_wallpaper(self: Self, image_url: str, location: str):
         # download image
