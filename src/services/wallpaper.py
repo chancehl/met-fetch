@@ -37,15 +37,18 @@ class WallpaperService:
 
         return image_url
 
-    def download_wallpaper(self: Self, image_url: str):
+    def download_wallpaper(self: Self, image_url: str, location: str):
         # download image
         response = requests.get(image_url)
 
         # create file
-        f = open("test.png", "wb")
+        f = open(location, "wb")
 
         # write to file
         f.write(response.content)
+
+        # close file
+        f.close()
 
     def set_wallpaper(self: Self, image_url: str):
         print(image_url)

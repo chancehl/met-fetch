@@ -2,6 +2,8 @@ import argparse
 
 from services import wallpaper
 
+DEFAULT_SAVE_LOCATION = "test.png"
+
 
 def main():
     # parser object
@@ -24,7 +26,7 @@ def main():
         help="Selects a random object from the objects returned. If no query is provided, this will search for a random object.",
     )
 
-    # random argument
+    # retries argument
     parser.add_argument(
         "-n",
         "--num-retries",
@@ -32,6 +34,16 @@ def main():
         default=3,
         metavar="num_retries",
         help="The number of times to retry to get a piece of art that has an image. Default=3.",
+    )
+
+    # outfile argument
+    parser.add_argument(
+        "-o",
+        "--outfile",
+        type=str,
+        default=None,
+        metavar="outfile",
+        help="The location to save the image to. By default the CLI will create a tmp file and then delete it after the run.",
     )
 
     # verbose argument
@@ -60,9 +72,18 @@ def main():
         if image_url is None or len(image_url) == 0:
             attempt += 1
         else:
-            wallpaper_service.download_wallpaper(image_url)
-            wallpaper_service.set_wallpaper(image_url)
+            # determine save location
+            location = (
+                args.outfile if args.outfile is not None else DEFAULT_SAVE_LOCATION
+            )
 
+            # download the file to specified location
+            wallpaper_service.download_wallpaper(image_url, location)
+
+            # set the wallpaper
+            wallpaper_service.set_wallpaper(location)
+
+            # exit process
             exit(0)
 
 
