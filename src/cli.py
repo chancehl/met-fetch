@@ -2,9 +2,9 @@ import argparse
 import os
 
 from api.met import download_artwork, get_artwork
-from utils.print import color, Color
+from models.artwork import print_artwork
+from models.args import get_save_location, get_count_from_args, validate_args
 
-DEFAULT_SAVE_LOCATION = "./images"
 NUM_RETRIES = 3
 
 
@@ -64,54 +64,44 @@ def main():
     # parse args
     args = parser.parse_args()
 
+    # validate args
+    validate_args(args=args)
+
     # determine appropriate count
-    if args.count > 1 and (args.random is None or args.random == False):
-        print(f"{color("Invalid arguments:", Color.YELLOW)} If the -r/--random flag is not passed, then count can only be 1")
+    total_count = get_count_from_args(args=args)
 
-    count = args.count if args.random is not None and args.random == True else 1
+    count = 0
 
-    image_count = 0
-
-    while image_count < count:
+    while count < total_count:
         attempt = 0
 
         # sometimes the API responds with a piece of art that does not have an image
         # when that happens, just retry
         while attempt < NUM_RETRIES:
-            met_artwork = get_artwork(query=args.query, choose_random=args.random)
+            artwork = get_artwork(query=args.query, random=args.random)
 
-            image_url = met_artwork.get("primaryImage")
+            image_url = artwork.get("primaryImage")
 
             if image_url is None or len(image_url) == 0:
                 attempt += 1
             else:
                 # determine save location
-                save_location = (
-                    args.outdir if args.outdir is not None else DEFAULT_SAVE_LOCATION
-                )
+                save_location = get_save_location(args=args)
 
                 # download the file to specified location
-                image_id = met_artwork.get("objectID")
-                
-                download_artwork(id=image_id, image_url=image_url, location=save_location)
+                download_artwork(
+                    id=artwork.get("objectID"),
+                    image_url=image_url,
+                    location=save_location,
+                )
 
                 # generate report
-                artists = met_artwork.get("constituents")
-                artist_name = (
-                    artists[0].get("name") if artists is not None else "Unknown"
-                )
-                department = met_artwork.get("department")
-                title = met_artwork.get("title")
-                object_date = met_artwork.get("objectDate")
-
-                print(
-                    f'{image_count+1}.) "{color(title, Color.CYAN)}" by {color(artist_name, Color.GREEN)} ({object_date}, {department} department)'
-                )
+                print_artwork(artwork=artwork)
 
                 # break out of loop if we've made it here
                 break
 
-        image_count += 1
+        count += 1
 
     # exit process
     exit(0)

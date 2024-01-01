@@ -1,11 +1,12 @@
 import os
 import requests
-import random
 
+
+from random import choice
 from typing import Optional
 
 
-def get_artwork(query: Optional[str], choose_random: bool) -> dict:
+def get_artwork(query: Optional[str], random: bool) -> dict:
     SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
     DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
@@ -19,7 +20,7 @@ def get_artwork(query: Optional[str], choose_random: bool) -> dict:
     object_ids = search_response_data["objectIDs"]
 
     # if random, grab a random object id from the first 20 else take first
-    object_id = random.choice(object_ids[0:20]) if choose_random else object_ids[0]
+    object_id = choice(object_ids[0:20]) if random else object_ids[0]
 
     # make detail GET request
     details_response = requests.get(url=f"{DETAILS_URL}/{object_id}")
