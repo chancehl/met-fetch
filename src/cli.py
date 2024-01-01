@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from services.met import MetropolitanMeseumOfArtService
+from api.met import download_artwork, get_artwork
 from utils.print import color, Color
 
 DEFAULT_SAVE_LOCATION = "./images"
@@ -64,9 +64,6 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # instantiate services
-    artwork_service = MetropolitanMeseumOfArtService()
-
     # determine appropriate count
     if args.count > 1 and (args.random is None or args.random == False):
         print(f"{color("Invalid arguments:", Color.YELLOW)} If the -r/--random flag is not passed, then count can only be 1")
@@ -81,7 +78,7 @@ def main():
         # sometimes the API responds with a piece of art that does not have an image
         # when that happens, just retry
         while attempt < NUM_RETRIES:
-            met_artwork = artwork_service.get_artwork(args.query, args.random)
+            met_artwork = get_artwork(args.query, args.random)
 
             image_url = met_artwork.get("primaryImage")
             image_id = met_artwork.get("objectID")
@@ -95,7 +92,7 @@ def main():
                 )
 
                 # download the file to specified location
-                artwork_service.download_artwork(image_id, image_url, save_location)
+                download_artwork(image_id, image_url, save_location)
 
                 # generate report
                 artists = met_artwork.get("constituents")
