@@ -78,10 +78,9 @@ def main():
         # sometimes the API responds with a piece of art that does not have an image
         # when that happens, just retry
         while attempt < NUM_RETRIES:
-            met_artwork = get_artwork(args.query, args.random)
+            met_artwork = get_artwork(query=args.query, choose_random=args.random)
 
             image_url = met_artwork.get("primaryImage")
-            image_id = met_artwork.get("objectID")
 
             if image_url is None or len(image_url) == 0:
                 attempt += 1
@@ -92,7 +91,9 @@ def main():
                 )
 
                 # download the file to specified location
-                download_artwork(image_id, image_url, save_location)
+                image_id = met_artwork.get("objectID")
+                
+                download_artwork(id=image_id, image_url=image_url, location=save_location)
 
                 # generate report
                 artists = met_artwork.get("constituents")
