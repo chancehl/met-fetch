@@ -3,7 +3,13 @@ import os
 
 from api.met import download_artwork, get_artwork
 from models.artwork import print_artwork
-from models.args import get_save_location, get_count_from_args, validate_args
+from models.args import (
+    get_save_location,
+    get_count_from_args,
+    validate_args,
+    ArgumentException,
+)
+from utils.print import color, Color
 
 NUM_RETRIES = 3
 
@@ -64,8 +70,12 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # valdiate args and terminate early if args are invalid
-    if not validate_args(args=args):
+    # valdiate args
+    try:
+        validate_args(args=args)
+    except ArgumentException as e:
+        print(color(f"Failed to validate arguments: {e}", Color.RED))
+
         exit(1)
 
     # determine appropriate count
