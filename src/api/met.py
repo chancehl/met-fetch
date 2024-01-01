@@ -3,10 +3,9 @@ import requests
 import random
 
 from typing import Optional
-from typing_extensions import Self
 
 
-def get_artwork(self: Self, query: Optional[str], choose_random: bool) -> dict:
+def get_artwork(query: Optional[str], choose_random: bool) -> dict:
     SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
     DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
@@ -31,7 +30,7 @@ def get_artwork(self: Self, query: Optional[str], choose_random: bool) -> dict:
     return details_response_data
 
 
-def download_artwork(self: Self, id: int, image_url: str, location: str):
+def download_artwork(id: int, image_url: str, location: str):
     # download image
     response = requests.get(image_url)
 
