@@ -64,8 +64,9 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # validate args
-    validate_args(args=args)
+    # valdiate args and terminate early if args are invalid
+    if not validate_args(args=args):
+        exit(1)
 
     # determine appropriate count
     total_count = get_count_from_args(args=args)
