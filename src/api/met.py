@@ -5,6 +5,7 @@ import requests
 from random import choice
 from typing import Optional
 
+FUZZY_SEARCH_THRESHOLD = 20
 
 SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
 DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
@@ -21,8 +22,12 @@ def get_artwork(query: Optional[str], random: bool) -> dict:
         # grab all object ids
         object_ids = search_response_data["objectIDs"]
 
-        # if random, grab a random object id from the first 20 else take first
-        object_id = choice(object_ids[0:20]) if random else object_ids[0]
+        # if not random take the first, else take a random one from the first 20
+        object_id = (
+            object_ids[0]
+            if not random
+            else choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
+        )
 
         # make detail GET request
         details_response = requests.get(url=f"{DETAILS_URL}/{object_id}")
