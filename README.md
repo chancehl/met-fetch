@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is a CLI tool for setting artwork from the Metropolitan Museum of Art as desktop backgrounds. It uses the MET API for artwork search and display.
+This project is a CLI tool for downloading artwork from the Metropolitan Museum of Art. It uses the MET API for artwork search and display.
 
 ## Features
 
