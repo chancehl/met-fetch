@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from api.met import download_artwork, get_artwork
+from api.met import download_artwork, get_artwork, search_artwork
 from models.artwork import print_artwork
 from models.args import (
     get_save_location,
@@ -10,8 +10,10 @@ from models.args import (
     ArgumentException,
 )
 from utils.print import color, Color
+from random import choice
 
 NUM_RETRIES = 3
+FUZZY_SEARCH_THRESHOLD = 20
 
 
 def main():
@@ -85,13 +87,23 @@ def main():
 
     viewed = []
 
-    while count < total_count:
+    # search for the query before looping
+    object_ids = search_artwork(query=args.query)
+
+    while count <= total_count:
         attempt = 0
 
         # sometimes the API responds with a piece of art that does not have an image
         # when that happens, just retry
         while attempt < NUM_RETRIES:
-            artwork = get_artwork(query=args.query, random=args.random)
+            # # if not random take the first, else take a random one from the first 20
+            object_id = (
+                object_ids[attempt]
+                if not args.random
+                else choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
+            )
+
+            artwork = get_artwork(id=object_id)
 
             image_url = artwork.get("primaryImage")
             artwork_id = artwork.get("objectID")

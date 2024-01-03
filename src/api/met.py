@@ -2,16 +2,14 @@ import os
 import requests
 
 
-from random import choice
-from typing import Optional
+from typing import List
 
-FUZZY_SEARCH_THRESHOLD = 20
 
 SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
 DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
 
-def get_artwork(query: Optional[str], random: bool) -> dict:
+def search_artwork(query: str) -> List[int]:
     try:
         # make search GET request
         search_response = requests.get(url=SEARCH_URL, params={"q": query})
@@ -22,19 +20,23 @@ def get_artwork(query: Optional[str], random: bool) -> dict:
         # grab all object ids
         object_ids = search_response_data["objectIDs"]
 
-        # if not random take the first, else take a random one from the first 20
-        object_id = (
-            object_ids[0]
-            if not random
-            else choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
-        )
+        # return object ids
+        return object_ids
+    except Exception as e:
+        print("Error while searching for artwork: ", e)
 
+        exit(1)
+
+
+def get_artwork(id: int) -> dict:
+    try:
         # make detail GET request
-        details_response = requests.get(url=f"{DETAILS_URL}/{object_id}")
+        details_response = requests.get(url=f"{DETAILS_URL}/{id}")
 
         # deserialize details response
         details_response_data = details_response.json()
 
+        # return data
         return details_response_data
     except Exception as e:
         print("Error while getting artwork from the MET API: ", e)
