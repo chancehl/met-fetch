@@ -1,6 +1,9 @@
+"""fetch.py"""
 import argparse
 import os
+import sys
 
+from random import choice
 from api.met import download_artwork, get_artwork, search_artwork
 from models.artwork import print_artwork
 from models.args import (
@@ -9,14 +12,15 @@ from models.args import (
     validate_args,
     ArgumentException,
 )
-from utils.print import color, Color
-from random import choice
+from utils.print import color, RED
 
 NUM_RETRIES = 3
 FUZZY_SEARCH_THRESHOLD = 20
 
 
 def main():
+    """This is the entrypoint of the application"""
+
     # this is needed in order to initialize the ANSI terminal colors on Windows, Linux
     os.system("")
 
@@ -77,9 +81,9 @@ def main():
     try:
         validate_args(args=args)
     except ArgumentException as e:
-        print(color(f"Failed to validate arguments: {e}", Color.RED))
+        print(color(f"Failed to validate arguments: {e}", RED))
 
-        exit(1)
+        sys.exit(1)
 
     # determine appropriate count
     total_count = get_count_from_args(args=args)
@@ -104,7 +108,7 @@ def main():
                 else choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
             )
 
-            artwork = get_artwork(id=object_id)
+            artwork = get_artwork(object_id=object_id)
 
             image_url = artwork.get("primaryImage")
             artwork_id = artwork.get("objectID")
@@ -127,7 +131,7 @@ def main():
 
                 # download the file to specified location
                 download_artwork(
-                    id=artwork_id,
+                    object_id=artwork_id,
                     image_url=image_url,
                     location=save_location,
                 )
@@ -144,7 +148,7 @@ def main():
         count += 1
 
     # exit process
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
