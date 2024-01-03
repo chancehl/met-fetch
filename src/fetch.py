@@ -17,6 +17,7 @@ FUZZY_SEARCH_THRESHOLD = 20
 
 
 def main():
+    # this is needed in order to initialize the ANSI terminal colors on Windows, Linux
     os.system("")
 
     # parser object
