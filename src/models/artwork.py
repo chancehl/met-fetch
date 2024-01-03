@@ -47,5 +47,6 @@ def print_artwork(artwork: MuseumArtwork):
     object_date = artwork.get("objectDate")
 
     print(
+        # pylint: disable-next=line-too-long
         f'"{color(title, CYAN)}" by {color(artist_name, GREEN)} ({object_date}, {department} department)'
     )

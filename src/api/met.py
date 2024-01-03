@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import List
 import requests
+import sys
 
 
 TIMEOUT = 3000
@@ -29,7 +30,7 @@ def search_artwork(query: str) -> List[int]:
     except requests.RequestException as e:
         print("Error while searching for artwork: ", e)
 
-        exit(1)
+        sys.exit(1)
 
 
 def get_artwork(object_id: int) -> dict:
@@ -48,7 +49,7 @@ def get_artwork(object_id: int) -> dict:
     except requests.RequestException as e:
         print("Error while getting artwork from the MET API: ", e)
 
-        exit(1)
+        sys.exit(1)
 
 
 def download_artwork(object_id: int, image_url: str, location: str):
@@ -74,4 +75,4 @@ def download_artwork(object_id: int, image_url: str, location: str):
     except requests.RequestException as e:
         print("Error while downloading artwork: ", e)
 
-        exit(1)
+        sys.exit(1)
