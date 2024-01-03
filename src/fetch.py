@@ -83,6 +83,8 @@ def main():
 
     count = 0
 
+    viewed = []
+
     while count < total_count:
         attempt = 0
 
@@ -92,8 +94,19 @@ def main():
             artwork = get_artwork(query=args.query, random=args.random)
 
             image_url = artwork.get("primaryImage")
+            artwork_id = artwork.get("objectID")
 
             if image_url is None or len(image_url) == 0:
+                print(
+                    f"Skipping artwork id {artwork_id} because it is missing an image."
+                )
+
+                attempt += 1
+            elif artwork_id in viewed:
+                print(
+                    f"Skipping artwork id {artwork_id} because it has already been downloaded."
+                )
+
                 attempt += 1
             else:
                 # determine save location
@@ -101,13 +114,16 @@ def main():
 
                 # download the file to specified location
                 download_artwork(
-                    id=artwork.get("objectID"),
+                    id=artwork_id,
                     image_url=image_url,
                     location=save_location,
                 )
 
                 # generate report
                 print_artwork(artwork=artwork)
+
+                # save this so we don't redownload the same image
+                viewed.append(artwork_id)
 
                 # break out of loop if we've made it here
                 break
