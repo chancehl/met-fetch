@@ -22,7 +22,7 @@ def main():
 
     # parser object
     parser = argparse.ArgumentParser(
-        description="A CLI tool for setting artwork from the Metropolitan Museum of Art as your desktop background"
+        description="A CLI for downloading images of artwork contained within the MET collection"
     )
 
     # query argument
