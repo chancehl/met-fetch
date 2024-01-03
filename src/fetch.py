@@ -91,7 +91,7 @@ def main():
     # search for the query before looping
     object_ids = search_artwork(query=args.query)
 
-    while count <= total_count:
+    while count < total_count:
         attempt = 0
 
         # sometimes the API responds with a piece of art that does not have an image

@@ -1,7 +1,7 @@
 import os
 import requests
 
-
+from pathlib import Path
 from typing import List
 
 
@@ -50,8 +50,10 @@ def download_artwork(id: int, image_url: str, location: str):
         response = requests.get(image_url)
 
         # check if outdir exists, if not create it
-        if not os.path.exists(location):
-            os.mkdir(location)
+        path = Path(location)
+
+        if not path.exists():
+            path.mkdir(parents=True)
 
         # create file
         f = open(os.path.join(location, f"{id}.png"), "wb")
