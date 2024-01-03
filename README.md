@@ -21,7 +21,7 @@ git clone https://github.com/chancehl/met-fetch.git
 2. Install `venv`
 
 ```bash
-pip install -g venv
+pip install -g virutalenv
 ```
 
 3. Create and activate a virtual environment
