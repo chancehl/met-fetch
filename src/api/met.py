@@ -2,8 +2,8 @@
 import os
 from pathlib import Path
 from typing import List
-import requests
 import sys
+import requests
 
 
 TIMEOUT = 3000
