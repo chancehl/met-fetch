@@ -65,13 +65,10 @@ def download_artwork(object_id: int, image_url: str, location: str):
             path.mkdir(parents=True)
 
         # create file
-        f = open(os.path.join(location, f"{object_id}.png"), "wb")
+        with open(os.path.join(location, f"{object_id}.png"), "wb") as f:
+            # write to file
+            f.write(response.content)
 
-        # write to file
-        f.write(response.content)
-
-        # close file
-        f.close()
     except requests.RequestException as e:
         print("Error while downloading artwork: ", e)
 

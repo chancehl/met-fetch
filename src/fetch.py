@@ -41,6 +41,7 @@ def main():
         type=bool,
         metavar="random",
         action=argparse.BooleanOptionalAction,
+        # pylint: disable-next=line-too-long
         help="Selects a random object from the objects returned. If no query is provided, this will search for a random object.",
     )
 
