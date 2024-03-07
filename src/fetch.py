@@ -80,12 +80,12 @@ def main():
 
     # report argument
     parser.add_argument(
-        "-e",
-        "--report",
+        "-s",
+        "--skip-report",
         type=bool,
-        metavar="report",
+        metavar="skip_report",
         action=argparse.BooleanOptionalAction,
-        help="Whether or not the tool should generate the report.json file."
+        help="Whether or not the tool should generate the report.json file.",
     )
 
     # parse args
@@ -127,15 +127,13 @@ def main():
             image_url = artwork.get("primaryImage")
             artwork_id = artwork.get("objectID")
 
-            has_already_been_downloaded = check_if_exists(artwork_id, viewed)
-
             if image_url is None or len(image_url) == 0:
                 print(
                     f"Skipping artwork id {artwork_id} because it is missing an image."
                 )
 
                 attempt += 1
-            elif has_already_been_downloaded:
+            elif check_if_exists(artwork_id, viewed):
                 print(
                     f"Skipping artwork id {artwork_id} because it has already been downloaded."
                 )
@@ -164,11 +162,9 @@ def main():
         count += 1
 
     # write report
-    if args.report:
+    if args.skip_report is None or args.skip_report is False:
         generate_report(art=viewed)
-    else:
-        print(f"Skipping report generation")
-    
+
     # exit process
     sys.exit(0)
 
@@ -189,6 +185,7 @@ def check_if_exists(obj_id: str, objects: List) -> bool:
             return True
 
     return False
+
 
 if __name__ == "__main__":
     main()
