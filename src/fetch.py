@@ -1,9 +1,11 @@
 """fetch.py"""
+
 import argparse
 import os
 import sys
 
 from random import choice
+from typing import List
 from api.met import download_artwork, get_artwork, search_artwork
 from models.artwork import print_artwork
 from models.args import (
@@ -13,6 +15,7 @@ from models.args import (
     ArgumentException,
 )
 from utils.print import color, RED
+from utils.report import generate_report
 
 NUM_RETRIES = 3
 FUZZY_SEARCH_THRESHOLD = 20
@@ -75,6 +78,16 @@ def main():
         help="Displays log output when set. Default=False.",
     )
 
+    # report argument
+    parser.add_argument(
+        "-e",
+        "--report",
+        type=bool,
+        metavar="report",
+        action=argparse.BooleanOptionalAction,
+        help="Whether or not the tool should generate the report.json file."
+    )
+
     # parse args
     args = parser.parse_args()
 
@@ -114,13 +127,15 @@ def main():
             image_url = artwork.get("primaryImage")
             artwork_id = artwork.get("objectID")
 
+            has_already_been_downloaded = check_if_exists(artwork_id, viewed)
+
             if image_url is None or len(image_url) == 0:
                 print(
                     f"Skipping artwork id {artwork_id} because it is missing an image."
                 )
 
                 attempt += 1
-            elif artwork_id in viewed:
+            elif has_already_been_downloaded:
                 print(
                     f"Skipping artwork id {artwork_id} because it has already been downloaded."
                 )
@@ -141,16 +156,39 @@ def main():
                 print_artwork(artwork=artwork)
 
                 # save this so we don't redownload the same image
-                viewed.append(artwork_id)
+                viewed.append(artwork)
 
                 # break out of loop if we've made it here
                 break
 
         count += 1
 
+    # write report
+    if args.report:
+        generate_report(art=viewed)
+    else:
+        print(f"Skipping report generation")
+    
     # exit process
     sys.exit(0)
 
+
+def check_if_exists(obj_id: str, objects: List) -> bool:
+    """
+    Checks to see if an object with a given id exists in a list
+
+    Parameters:
+    id (str): The object id we are searching for
+    objects (list): All objects
+
+    Returns:
+    bool: True if object exists, False otherwise
+    """
+    for obj in objects:
+        if obj.get("id" == obj_id):
+            return True
+
+    return False
 
 if __name__ == "__main__":
     main()
