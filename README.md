@@ -49,7 +49,6 @@ python [main_script_name].py [options]
 Options include:
 
 ```
--r, --random: Selects a random object.
 -o, --outdir: Specifies the save location.
 -n, --count: Number of images to return.
 -v, --verbose: Displays log output.
@@ -58,13 +57,13 @@ Options include:
 Example:
 
 ```bash
-python ./src/fetch.py "still life" -n 3 -r -o ./images
+python ./src/fetch.py "still life" -n 3 -o ./images
 ```
 
 Help:
 
 ```
-usage: fetch.py [-h] [-r | --random | --no-random] [-o outdir] [-n count] [-v | --verbose | --no-verbose] [query]
+usage: fetch.py [-h] [-o outdir] [-n count] [-v | --verbose | --no-verbose] [-s | --skip-report | --no-skip-report] [query]
 
 A CLI for downloading images of artwork contained within the MET collection
 
@@ -73,14 +72,14 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -r, --random, --no-random
-                        Selects a random object from the objects returned. If no query is provided, this will search for a random object.
   -o outdir, --outdir outdir
                         The location to save the images to.
   -n count, --count count
                         The count of images to return
   -v, --verbose, --no-verbose
                         Displays log output when set. Default=False.
+  -s, --skip-report, --no-skip-report
+                        Whether or not the tool should generate the report.json file.
 ```
 
 ## Contributing

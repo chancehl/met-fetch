@@ -9,12 +9,9 @@ from api.met import download_artwork, get_artwork, search_artwork
 from models.artwork import print_artwork
 from models.args import (
     get_save_location,
-    get_count_from_args,
-    validate_args,
-    ArgumentException,
+    get_count_from_args
 )
 from utils.list import check_if_exists
-from utils.print import color, RED
 from utils.report import generate_report
 
 NUM_RETRIES = 3
