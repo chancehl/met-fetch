@@ -14,11 +14,6 @@ def get_save_location(args) -> str:
     return args.outdir if args.outdir is not None else DEFAULT_SAVE_LOCATION
 
 
-def validate_args(args):
-    """Raises an exception if the provided arguments are invalid"""
-    pass
-
-
 def get_count_from_args(args) -> int:
     """Gets the count based on the user provided args"""
     return args.count if args.count is not None else 1

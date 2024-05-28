@@ -80,14 +80,6 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # validate args
-    try:
-        validate_args(args=args)
-    except ArgumentException as e:
-        print(color(f"Failed to validate arguments: {e}", RED))
-
-        sys.exit(1)
-
     # determine appropriate count
     total_count = get_count_from_args(args=args)
 
