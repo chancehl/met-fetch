@@ -5,7 +5,6 @@ import os
 import sys
 
 from random import choice
-from typing import List
 from api.met import download_artwork, get_artwork, search_artwork
 from models.artwork import print_artwork
 from models.args import (
@@ -14,6 +13,7 @@ from models.args import (
     validate_args,
     ArgumentException,
 )
+from utils.list import check_if_exists
 from utils.print import color, RED
 from utils.report import generate_report
 
@@ -35,17 +35,6 @@ def main():
     # query argument
     parser.add_argument(
         "query", nargs="?", type=str, default=None, help="Query help text"
-    )
-
-    # random argument
-    parser.add_argument(
-        "-r",
-        "--random",
-        type=bool,
-        metavar="random",
-        action=argparse.BooleanOptionalAction,
-        # pylint: disable-next=line-too-long
-        help="Selects a random object from the objects returned. If no query is provided, this will search for a random object.",
     )
 
     # outfile argument
@@ -91,7 +80,7 @@ def main():
     # parse args
     args = parser.parse_args()
 
-    # valdiate args
+    # validate args
     try:
         validate_args(args=args)
     except ArgumentException as e:
@@ -116,11 +105,7 @@ def main():
         # when that happens, just retry
         while attempt < NUM_RETRIES:
             # # if not random take the first, else take a random one from the first 20
-            object_id = (
-                object_ids[attempt]
-                if not args.random
-                else choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
-            )
+            object_id = choice(object_ids[0:FUZZY_SEARCH_THRESHOLD])
 
             artwork = get_artwork(object_id=object_id)
 
@@ -153,7 +138,7 @@ def main():
                 # generate report
                 print_artwork(artwork=artwork)
 
-                # save this so we don't redownload the same image
+                # save this so we don't re-download the same image
                 viewed.append(artwork)
 
                 # break out of loop if we've made it here
@@ -167,24 +152,6 @@ def main():
 
     # exit process
     sys.exit(0)
-
-
-def check_if_exists(obj_id: str, objects: List) -> bool:
-    """
-    Checks to see if an object with a given id exists in a list
-
-    Parameters:
-    id (str): The object id we are searching for
-    objects (list): All objects
-
-    Returns:
-    bool: True if object exists, False otherwise
-    """
-    for obj in objects:
-        if obj.get("id" == obj_id):
-            return True
-
-    return False
 
 
 if __name__ == "__main__":

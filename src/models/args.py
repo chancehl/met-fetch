@@ -16,12 +16,9 @@ def get_save_location(args) -> str:
 
 def validate_args(args):
     """Raises an exception if the provided arguments are invalid"""
-    if args.count > 1 and (args.random is None or args.random is False):
-        raise ArgumentException(
-            "If the -r/--random flag is not passed, then count can only be 1."
-        )
+    pass
 
 
 def get_count_from_args(args) -> int:
     """Gets the count based on the user provided args"""
-    return args.count if args.random is not None and args.random is True else 1
+    return args.count if args.count is not None else 1
