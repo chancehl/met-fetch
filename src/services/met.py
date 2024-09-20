@@ -1,4 +1,5 @@
 """met.py"""
+
 import os
 from pathlib import Path
 from typing import List
@@ -11,7 +12,7 @@ SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
 DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
 
 
-def search_artwork(query: str) -> List[int]:
+def search_for_artwork(query: str) -> List[int]:
     """Queries the MET API for artwork matching a value"""
     try:
         # make search GET request
@@ -52,9 +53,12 @@ def get_artwork(object_id: int) -> dict:
         sys.exit(1)
 
 
-def download_artwork(object_id: int, image_url: str, location: str):
+def download_artwork(artwork: dict, location: str):
     """Downloads artwork to disk"""
     try:
+        object_id = artwork["objectID"]
+        image_url = artwork["primaryImage"]
+
         # download image
         response = requests.get(url=image_url, timeout=TIMEOUT)
 
@@ -68,7 +72,6 @@ def download_artwork(object_id: int, image_url: str, location: str):
         with open(os.path.join(location, f"{object_id}.png"), "wb") as f:
             # write to file
             f.write(response.content)
-
     except requests.RequestException as e:
         print("Error while downloading artwork: ", e)
 
