@@ -43,11 +43,12 @@ def format_artwork_name(artwork: MuseumArtwork):
 
 
 def is_valid_artwork(artwork, processed: List[MuseumArtwork]) -> bool:
-    artwork_id = artwork["objectID"]
-    image_url = artwork["primaryImage"]
+    artwork_id = artwork.get("objectID")
+    image_url = artwork.get("primaryImage")
 
     if (
-        image_url is not None
+        artwork_id is not None
+        and image_url is not None
         and len(image_url) > 0
         and not is_already_processed(artwork_id, processed)
     ):
