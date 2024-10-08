@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import re
 from typing import List
 import sys
 import requests
@@ -56,7 +57,6 @@ def get_artwork(object_id: int) -> dict:
 def download_artwork(artwork: dict, location: str):
     """Downloads artwork to disk"""
     try:
-        object_id = artwork["objectID"]
         image_url = artwork["primaryImage"]
 
         # download image
@@ -68,11 +68,46 @@ def download_artwork(artwork: dict, location: str):
         if not path.exists():
             path.mkdir(parents=True)
 
+        name = generate_pretty_filename(artwork)
+
         # create file
-        with open(os.path.join(location, f"{object_id}.png"), "wb") as f:
+        with open(os.path.join(location, f"{name}.png"), "wb") as f:
             # write to file
             f.write(response.content)
     except requests.RequestException as e:
         print("Error while downloading artwork: ", e)
 
         sys.exit(1)
+
+
+def generate_pretty_filename(data: dict) -> str:
+    # Ensure required field objectID exists
+    object_id = str(data.get("objectID"))
+
+    # Get the title and artistDisplayName from the dictionary
+    title = data.get("title", "")
+    artist_display_name = data.get("artistDisplayName", "")
+
+    # Combine title and artist if both exist, otherwise fallback to just title or artist
+    if title and artist_display_name:
+        base_name = f"{artist_display_name}-{title}"
+    elif title:
+        base_name = title
+    elif artist_display_name:
+        base_name = artist_display_name
+    else:
+        base_name = object_id  # Fallback to just the objectID if no title or artist
+
+    # Clean the base name to only include alphanumeric characters and underscores
+    base_name = re.sub(r"[^a-zA-Z0-9]+", "_", base_name.strip())
+
+    # Enforce a reasonable length limit (e.g., 50 characters), include objectID at the end
+    if len(base_name) > 45:
+        base_name = base_name[:45].rstrip(
+            "_"
+        )  # Truncate and remove trailing underscores
+
+    # Append the objectID to ensure uniqueness
+    pretty_filename = f"{base_name}_{object_id}"
+
+    return pretty_filename.lower()
