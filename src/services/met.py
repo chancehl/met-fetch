@@ -1,11 +1,11 @@
-"""met.py"""
-
 import os
 from pathlib import Path
 import re
 from typing import List
 import sys
 import requests
+
+from models.artwork import MuseumArtwork
 
 
 TIMEOUT = 3000
@@ -35,7 +35,7 @@ def search_for_artwork(query: str) -> List[int]:
         sys.exit(1)
 
 
-def get_artwork(object_id: int) -> dict:
+def get_artwork(object_id: int) -> MuseumArtwork:
     """Queries the MET API for a specific object"""
     try:
         # make detail GET request
@@ -47,20 +47,18 @@ def get_artwork(object_id: int) -> dict:
         details_response_data = details_response.json()
 
         # return data
-        return details_response_data
+        return MuseumArtwork(**details_response_data)
     except requests.RequestException as e:
         print("Error while getting artwork from the MET API: ", e)
 
         sys.exit(1)
 
 
-def download_artwork(artwork: dict, location: str):
+def download_artwork(artwork: MuseumArtwork, location: str):
     """Downloads artwork to disk"""
     try:
-        image_url = artwork["primaryImage"]
-
         # download image
-        response = requests.get(url=image_url, timeout=TIMEOUT)
+        response = requests.get(url=artwork.primaryImage, timeout=TIMEOUT)
 
         # check if outdir exists, if not create it
         path = Path(location)
@@ -80,13 +78,13 @@ def download_artwork(artwork: dict, location: str):
         sys.exit(1)
 
 
-def generate_pretty_filename(data: dict) -> str:
+def generate_pretty_filename(artwork: MuseumArtwork) -> str:
     # Ensure required field objectID exists
-    object_id = str(data.get("objectID"))
+    object_id = str(artwork.objectID)
 
     # Get the title and artistDisplayName from the dictionary
-    title = data.get("title", "")
-    artist_display_name = data.get("artistDisplayName", "")
+    title = artwork.title
+    artist_display_name = artwork.artistDisplayName
 
     # Combine title and artist if both exist, otherwise fallback to just title or artist
     if title and artist_display_name:

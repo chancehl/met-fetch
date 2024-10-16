@@ -5,7 +5,7 @@ from yaspin import yaspin
 from yaspin.spinners import Spinners
 from services.met import download_artwork, get_artwork, search_for_artwork
 from utils.list import pick_random_object
-from models.artwork import is_valid_artwork, format_artwork_name, print_report
+from models.artwork import is_valid_artwork, print_artwork, print_report
 from models.args import CommandLineArguments
 
 
@@ -34,7 +34,7 @@ def main():
 
             if is_valid_artwork(artwork, processed):
                 # update spinner
-                spinner.text = f"Downloading {format_artwork_name(artwork)}"
+                spinner.text = f"Downloading {print_artwork(artwork)}"
 
                 # download the file to specified location
                 download_artwork(artwork, outdir)
