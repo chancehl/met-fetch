@@ -57,6 +57,10 @@ def get_artwork(object_id: int) -> MuseumArtwork:
 def download_artwork(artwork: MuseumArtwork, location: str):
     """Downloads artwork to disk"""
     try:
+        # throw if we don't have an image to download
+        if artwork.primaryImage is None:
+            raise TypeError(f"artwork ${artwork.objectID} is missing primary image")
+
         # download image
         response = requests.get(url=artwork.primaryImage, timeout=TIMEOUT)
 
