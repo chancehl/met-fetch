@@ -1,10 +1,10 @@
 import os
+from random import choice
 import sys
 
 from yaspin import yaspin
 from yaspin.spinners import Spinners
-from services.met_service import download_artwork, get_artwork, search_for_artwork
-from utils.list import pick_random_object
+from met_api import download_artwork, get_artwork, search_for_artwork
 from models.artwork import is_valid_artwork, format_artwork_data, print_report
 from models.args import CommandLineArguments
 
@@ -18,6 +18,7 @@ def main():
     count = arguments.get_count()
     outdir = arguments.get_outdir()
     query = arguments.get_query()
+    fuzziness = arguments.get_fuzziness()
 
     processed = []
 
@@ -28,7 +29,7 @@ def main():
         matching_pieces = search_for_artwork(query)
 
         while len(processed) < count:
-            random_id = pick_random_object(matching_pieces)
+            random_id = choice(matching_pieces[0:fuzziness])
 
             artwork = get_artwork(object_id=random_id)
 

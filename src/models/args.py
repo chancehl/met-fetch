@@ -3,6 +3,7 @@
 import argparse
 
 DEFAULT_SAVE_LOCATION = "./images"
+DEFAULT_FUZZINESS = 20
 
 
 class ArgumentException(Exception):
@@ -63,6 +64,16 @@ class CommandLineArguments:
             help="Whether or not the tool should generate the report.json file.",
         )
 
+        # fuzziness argument
+        self.parser.add_argument(
+            "-f",
+            "--fuzziness",
+            type=int,
+            default=DEFAULT_FUZZINESS,
+            metavar="fuzziness",
+            help="How much leeway to allow the random image selection process (note: higher values mean you may see less artwork and more artifacts, sculptures, etc.)",
+        )
+
         # parse args
         self.args = self.parser.parse_args()
 
@@ -75,6 +86,13 @@ class CommandLineArguments:
     def get_outdir(self):
         return (
             self.args.outdir if self.args.outdir is not None else DEFAULT_SAVE_LOCATION
+        )
+
+    def get_fuzziness(self):
+        return (
+            self.args.fuzziness
+            if self.args.fuzziness is not None
+            else DEFAULT_FUZZINESS
         )
 
     def get_query(self):
