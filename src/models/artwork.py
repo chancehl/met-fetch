@@ -1,11 +1,13 @@
 # pylint: disable=invalid-name,too-many-instance-attributes
 # matching MET API model format
-from typing import List, Literal, Optional
+import re
+from typing import List, Optional, Self
 from dataclasses import dataclass
 
 from models.constituent import Constituent
 from models.measurements import Measurement
 from models.tag import Tag
+from format import format_with_color
 
 CYAN = "\033[36m"
 GREEN = "\033[32m"
@@ -72,52 +74,36 @@ class MuseumArtwork:
     isTimelineWork: bool
     GalleryNumber: Optional[str]
 
-    # convert all nested subfields to dataclass
-    def __post_init__(self):
-        if self.constituents is not None and len(self.constituents) > 0:
+    def __post_init__(self: Self):
+        """Post-initialization processing to convert nested dictionaries into objects."""
+        if self.constituents:
             self.constituents = [
-                Constituent(**constituent)
-                for constituent in self.constituents
-                if isinstance(constituent, dict)
+                Constituent(**const) if isinstance(const, dict) else const
+                for const in self.constituents
             ]
 
-        if self.tags is not None and len(self.tags) > 0:
-            self.tags = [Tag(**tag) for tag in self.tags if isinstance(tag, dict)]
+        if self.tags:
+            self.tags = [
+                Tag(**tag) if isinstance(tag, dict) else tag for tag in self.tags
+            ]
 
+    def get_file_name(self: Self) -> str:
+        """Generate a clean filename based on artwork's title or artist."""
+        base_name = self.artistDisplayName or self.title or str(self.objectID)
 
-def get_artist_name(artwork: MuseumArtwork) -> str:
-    artists = artwork.constituents
+        # Clean the base name to only include alphanumeric characters and underscores
+        base_name = re.sub(r"[^a-zA-Z0-9]+", "_", base_name.strip())
 
-    return artists[0].name if artists is not None else "Unknown artist"
+        # Truncate the name if too long
+        base_name = base_name[:45].rstrip("_") if len(base_name) > 45 else base_name
 
+        return f"{base_name}_{self.objectID}.png".lower()
 
-def is_valid_artwork(artwork, processed: List[MuseumArtwork]) -> bool:
-    return (
-        artwork.objectID is not None
-        and artwork.primaryImage is not None
-        and len(artwork.primaryImage) > 0
-        and not is_already_processed(artwork.objectID, processed)
-    )
+    def get_artist_name(self: Self) -> str:
+        """Return the name of the first artist, or 'Unknown artist'."""
+        return self.constituents[0].name if self.constituents else "Unknown artist"
 
-
-def is_already_processed(artwork_id: int, processed: List[MuseumArtwork]) -> bool:
-    return any(artwork.objectID == artwork_id for artwork in processed)
-
-
-def print_report(artwork: List[MuseumArtwork], outdir: str) -> None:
-    print("Downloaded the following pieces:\n")
-
-    for art in artwork:
-        print(f"* {format_artwork_data(art)}")
-
-    print(f"\nSaved artwork to: {outdir}")
-
-
-def format_artwork_data(artwork: MuseumArtwork):
-    artist_name = get_artist_name(artwork)
-
-    return f'"{format_with_color(artwork.title, CYAN)}" by {format_with_color(artist_name, GREEN)} ({artwork.objectDate}, {artwork.department} department)'
-
-
-def format_with_color(s: str, color: Literal["\u001b[32m", "\u001b[36m"]) -> str:
-    return f"{color}{s}{RESET}"
+    def generate_summary(self: Self) -> str:
+        """Generate a formatted summary of the artwork."""
+        artist_name = self.get_artist_name()
+        return f'"{format_with_color(self.title, CYAN)}" by {format_with_color(artist_name, GREEN)} ({self.objectDate}, {self.department} department, piece no. {self.objectID})'
