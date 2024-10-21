@@ -101,7 +101,7 @@ class MuseumArtwork:
 
     def get_artist_name(self: Self) -> str:
         """Return the name of the first artist, or 'Unknown artist'."""
-        return self.constituents[0].name if self.constituents else "Unknown artist"
+        return self.artistDisplayName if self.artistDisplayName else "Unknown artist"
 
     def generate_summary(self: Self) -> str:
         """Generate a formatted summary of the artwork."""
