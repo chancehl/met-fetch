@@ -10,7 +10,7 @@ from met import get_artwork, search_for_artwork, get_image_bytes
 from models.artwork import MuseumArtwork
 from models.args import CommandLineArguments
 from report import print_report_to_console
-from writer import write_bytes
+from writer import write_bytes_with_exif
 
 
 def main():
@@ -51,7 +51,7 @@ def main():
                 name = artwork.get_file_name()
 
                 # write bytes to disk
-                write_bytes(name, image_bytes, outdir)
+                write_bytes_with_exif(artwork, image_bytes, outdir)
 
                 # Save to avoid re-downloading
                 processed.append(artwork)

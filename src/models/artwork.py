@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name,too-many-instance-attributes
 # matching MET API model format
-import re
 from typing import List, Optional, Self
 from dataclasses import dataclass
 
@@ -89,15 +88,7 @@ class MuseumArtwork:
 
     def get_file_name(self: Self) -> str:
         """Generate a clean filename based on artwork's title or artist."""
-        base_name = self.artistDisplayName or self.title or str(self.objectID)
-
-        # Clean the base name to only include alphanumeric characters and underscores
-        base_name = re.sub(r"[^a-zA-Z0-9]+", "_", base_name.strip())
-
-        # Truncate the name if too long
-        base_name = base_name[:45].rstrip("_") if len(base_name) > 45 else base_name
-
-        return f"{base_name}_{self.objectID}.png".lower()
+        return f"{self.objectID}.jpg"
 
     def get_artist_name(self: Self) -> str:
         """Return the name of the first artist, or 'Unknown artist'."""
