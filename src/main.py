@@ -25,6 +25,7 @@ def main():
     outdir = arguments.get_outdir()
     query = arguments.get_query()
     fuzziness = arguments.get_fuzziness()
+    exact = arguments.get_exact()
 
     # List to keep track of processed artworks
     processed: List[MuseumArtwork] = []
@@ -35,7 +36,14 @@ def main():
         matching_ids = search_for_artwork(query)
 
         while len(processed) < count:
-            artwork = get_artwork(choice(matching_ids[:fuzziness]))
+            chosen_piece = None
+
+            if exact:
+                chosen_piece = matching_ids[len(processed)]
+            else:
+                chosen_piece = choice(matching_ids[:fuzziness])
+
+            artwork = get_artwork(chosen_piece)
 
             primary_img_url = (
                 "" if artwork.primaryImage is None else artwork.primaryImage

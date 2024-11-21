@@ -64,6 +64,17 @@ class CommandLineArguments:
             help="Whether or not the tool should generate the report.json file.",
         )
 
+        # exact argument
+        self.parser.add_argument(
+            "-e",
+            "--exact",
+            type=bool,
+            default=False,
+            action=argparse.BooleanOptionalAction,
+            metavar="exact",
+            help="This flag will force the application to match the query as closely as possible",
+        )
+
         # fuzziness argument
         self.parser.add_argument(
             "-f",
@@ -94,6 +105,9 @@ class CommandLineArguments:
             if self.args.fuzziness is not None
             else DEFAULT_FUZZINESS
         )
+
+    def get_exact(self):
+        return self.args.exact
 
     def get_query(self):
         return self.args.query
