@@ -111,26 +111,7 @@ python -m pytest --cov=src          # With coverage
 make test                           # Run tests
 make test-coverage                  # Run with coverage
 make test-report                    # Generate HTML coverage report
-
-# Using test runner script
-python run_tests.py                 # Comprehensive test run
 ```
-
-### Test Coverage
-
-The project maintains high test coverage with a minimum threshold of 80%. Current coverage includes:
-
-- ✅ `report.py` - 100% coverage
-  - JSON report generation
-  - Console output formatting
-  - Error handling
-  - Edge cases
-
-For detailed testing information, see [TESTING.md](TESTING.md).
-
-## Contributing
-
-Don't.
 
 ## License
 
