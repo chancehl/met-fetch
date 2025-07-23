@@ -30,42 +30,50 @@ def main():
     # List to keep track of processed artworks
     processed: List[MuseumArtwork] = []
 
-    with yaspin(
-        Spinners.dots, text="Searching for artwork...", color="cyan"
-    ) as spinner:
-        matching_ids = search_for_artwork(query)
+    spinner = yaspin(Spinners.dots, text="Searching for artwork...", color="cyan")
+    spinner.start()
 
-        while len(processed) < count:
-            chosen_piece = None
+    matching_ids = search_for_artwork(query)
+    if len(matching_ids) == 0:
+        spinner.stop()
+        print(f'Did not find any results for query "{query}"')
+        sys.exit(1)
 
-            if exact:
-                chosen_piece = matching_ids[len(processed)]
-            else:
-                chosen_piece = choice(matching_ids[:fuzziness])
+    while len(processed) < count:
+        chosen_piece = None
 
-            artwork = get_artwork(chosen_piece)
+        if exact:
+            chosen_piece = matching_ids[len(processed)]
+        else:
+            chosen_piece = choice(matching_ids[:fuzziness])
 
-            primary_img_url = (
-                "" if artwork.primaryImage is None else artwork.primaryImage
-            )
+        artwork = get_artwork(chosen_piece)
 
-            already_processed = any(a.objectID == artwork.objectID for a in processed)
+        primary_img_url = "" if artwork.primaryImage is None else artwork.primaryImage
 
-            if len(primary_img_url) > 0 and not already_processed:
-                spinner.text = f"Downloading {artwork.generate_summary()}"
+        already_processed = any(a.objectID == artwork.objectID for a in processed)
 
-                # download image bytes and generate a file name
-                image_bytes = get_image_bytes(primary_img_url)
-                name = artwork.get_file_name()
+        if len(primary_img_url) > 0 and not already_processed:
+            spinner.text = f"Downloading {artwork.generate_summary()}"
 
-                # write bytes to disk
-                write_bytes_with_exif(artwork, image_bytes, outdir)
+            # download image bytes and generate a file name
+            image_bytes = get_image_bytes(primary_img_url)
+            name = artwork.get_file_name()
 
-                # Save to avoid re-downloading
-                processed.append(artwork)
+            # write bytes to disk
+            write_bytes_with_exif(artwork, image_bytes, outdir)
 
-    # Print report to console
-    print_report_to_console(processed, outdir)
+            # Save to avoid re-downloading
+            processed.append(artwork)
+
+    # stop spinner
+    spinner.stop()
+
+    # process results
+    if len(processed) > 0:
+        print_report_to_console(processed, outdir)
+    else:
+        print("No results were processed")
 
     # Exit process
     sys.exit(0)

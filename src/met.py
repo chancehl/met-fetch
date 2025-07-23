@@ -4,7 +4,6 @@ import requests
 
 from models.artwork import MuseumArtwork
 
-
 TIMEOUT = 3000
 SEARCH_URL = "https://collectionapi.metmuseum.org/public/collection/v1/search"
 DETAILS_URL = "https://collectionapi.metmuseum.org/public/collection/v1/objects"
@@ -20,6 +19,8 @@ def search_for_artwork(query: str) -> List[int]:
 
         # deserialize search response
         search_response_data = search_response.json()
+        if search_response_data["objectIDs"] is None:
+            return []
 
         # grab all object ids
         object_ids = search_response_data["objectIDs"]

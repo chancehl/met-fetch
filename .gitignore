@@ -166,3 +166,5 @@ cython_debug/
 
 # Report file
 report.json
+
+.DS_Store
