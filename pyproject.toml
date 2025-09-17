@@ -1,0 +1,26 @@
+[project]
+name = "met-fetch"
+version = "0.1.0"
+description = "A CLI tool for downloading artwork from the Metropolitan Museum of Art"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=11.0.0",
+    "requests>=2.31.0",
+    "termcolor>=2.3.0",
+    "yaspin>=3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+]
+
+[project.scripts]
+met-fetch = "src.fetch:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
